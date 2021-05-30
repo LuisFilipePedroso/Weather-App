@@ -1,5 +1,14 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Card, CardActionArea, CardActions, CardContent, Grid, Paper, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
+  CardActions,
+  CardContent,
+  Grid,
+  Typography,
+} from '@material-ui/core';
 
 import { CityType } from '../../App';
 
@@ -9,20 +18,25 @@ export type WeatherInfoType = {
   temp_max: number;
   temp_min: number;
   dateAndTime?: string;
-}
+};
 
 type Props = {
   data: WeatherInfoType;
   city: string | undefined;
   currentTempLabel?: string;
   canSetAsFavorite?: boolean;
-}
+};
 
-function WeatherInfo({ data, city, currentTempLabel = 'Temperatura', canSetAsFavorite = true }: Props) {
+function WeatherInfo({
+  data,
+  city,
+  currentTempLabel = 'Temperatura',
+  canSetAsFavorite = true,
+}: Props) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    let favorites = localStorage.getItem('@weatherapp/favorites_cities');
+    const favorites = localStorage.getItem('@weatherapp/favorites_cities');
 
     if (favorites !== null) {
       const parsedFavorites = JSON.parse(favorites) as CityType[];
@@ -36,13 +50,13 @@ function WeatherInfo({ data, city, currentTempLabel = 'Temperatura', canSetAsFav
 
     return () => {
       setIsFavorite(false);
-    }
+    };
   }, [city]);
 
-  const tempIcon = useMemo(() => data?.temp > 20 ? '☀️' : '🥶', [data?.temp]);
+  const tempIcon = useMemo(() => (data?.temp > 20 ? '☀️' : '🥶'), [data?.temp]);
 
   const setAsFavorite = useCallback(() => {
-    let favorites = localStorage.getItem('@weatherapp/favorites_cities');
+    const favorites = localStorage.getItem('@weatherapp/favorites_cities');
 
     if (favorites !== null) {
       const parsedFavorites = JSON.parse(favorites) as CityType[];
@@ -51,24 +65,38 @@ function WeatherInfo({ data, city, currentTempLabel = 'Temperatura', canSetAsFav
 
       if (exists) {
         const newFavorites = parsedFavorites.filter(c => c.title !== city);
-        console.log('NEW FAVORITES: ', newFavorites);
-        localStorage.setItem('@weatherapp/favorites_cities', JSON.stringify(newFavorites));
+        localStorage.setItem(
+          '@weatherapp/favorites_cities',
+          JSON.stringify(newFavorites),
+        );
         setIsFavorite(false);
         return;
       }
 
-      localStorage.setItem('@weatherapp/favorites_cities', JSON.stringify([...parsedFavorites, { title: city }]));
+      localStorage.setItem(
+        '@weatherapp/favorites_cities',
+        JSON.stringify([...parsedFavorites, { title: city }]),
+      );
       setIsFavorite(true);
       return;
     }
 
-    localStorage.setItem('@weatherapp/favorites_cities', JSON.stringify([{ title: city }]));
+    localStorage.setItem(
+      '@weatherapp/favorites_cities',
+      JSON.stringify([{ title: city }]),
+    );
     setIsFavorite(true);
   }, [city]);
 
-  const cityName = useMemo(() => isFavorite ? `${city} 🌟` : city, [city, isFavorite]);
+  const cityName = useMemo(
+    () => (isFavorite ? `${city} 🌟` : city),
+    [city, isFavorite],
+  );
 
-  const favoriteButtonText = useMemo(() => isFavorite ? 'Unset as Favorite ★' : 'Set as Favorite ★', [isFavorite]);
+  const favoriteButtonText = useMemo(
+    () => (isFavorite ? 'Unset as Favorite ★' : 'Set as Favorite ★'),
+    [isFavorite],
+  );
 
   return (
     <Box mt={3} justifySelf="center" width="100%">
@@ -79,10 +107,20 @@ function WeatherInfo({ data, city, currentTempLabel = 'Temperatura', canSetAsFav
               <Typography gutterBottom variant="h4" component="h3">
                 {cityName}
               </Typography>
-              <Typography gutterBottom variant="h6" color="textPrimary" component="h4">
+              <Typography
+                gutterBottom
+                variant="h6"
+                color="textPrimary"
+                component="h4"
+              >
                 {tempIcon} {currentTempLabel}: {data.temp} °C
               </Typography>
-              <Typography gutterBottom variant="body1" color="textPrimary" component="h3">
+              <Typography
+                gutterBottom
+                variant="body1"
+                color="textPrimary"
+                component="h3"
+              >
                 💧 Umidade: {data.humidity}
               </Typography>
               <Typography variant="body2" color="textSecondary" component="h4">

@@ -1,32 +1,34 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import AutoComplete from './components/AutoComplete';
+import React, { useCallback, useState } from 'react';
 import { TextField, Grid, Box, Typography, Button } from '@material-ui/core';
-import WeatherInfo, { WeatherInfoType } from './components/WeatherInfo';
 
 import { groupBy } from 'lodash';
 import { format } from 'date-fns';
+import WeatherInfo, { WeatherInfoType } from './components/WeatherInfo';
+import AutoComplete from './components/AutoComplete';
 import FiveDayWeatherInfo from './components/FiveDayWeatherInfo';
 
 export type CityType = {
   title: string;
-}
+};
 
 export type FiveDayForecastType = {
   date: string;
   forecast: WeatherInfoType[];
-}
+};
 
 enum FetchForecastEnum {
   NOW,
-  FIVEDAY
+  FIVEDAY,
 }
 
-const API_KEY = '5dcec63d6d98e98943ea329fb5cb14f7';
+const BASE_URL = 'http://api.openweathermap.org/data/2.5';
 
-function App() {
+const App = () => {
   const [city, setCity] = useState<CityType | null>(null);
-  const [todayWeatherInfo, setTodayWeatherInfo] = useState<WeatherInfoType | null>(null);
-  const [fiveDayWeatherInfo, setFiveDayWeatherInfo] = useState<FiveDayForecastType[] | null>(null);
+  const [todayWeatherInfo, setTodayWeatherInfo] =
+    useState<WeatherInfoType | null>(null);
+  const [fiveDayWeatherInfo, setFiveDayWeatherInfo] =
+    useState<FiveDayForecastType[] | null>(null);
 
   const cities = [
     { title: 'Agronômica' },
@@ -41,45 +43,54 @@ function App() {
     setCity(value);
     setTodayWeatherInfo(null);
     setFiveDayWeatherInfo(null);
-  }
+  };
 
-  const fetchForecast = useCallback(async (type: FetchForecastEnum) => {
-    if (!city) {
-      return;
-    }
+  const fetchForecast = useCallback(
+    async (type: FetchForecastEnum) => {
+      if (!city) {
+        return;
+      }
 
-    if (type === FetchForecastEnum.NOW) {
-      const request = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city?.title}&appid=${API_KEY}&units=metric`);
+      if (type === FetchForecastEnum.NOW) {
+        const request = await fetch(
+          `${BASE_URL}/weather?q=${city?.title}&appid=${process.env.REACT_APP_API_KEY}&units=metric`,
+        );
+        const response = await request.json();
+
+        setFiveDayWeatherInfo(null);
+        setTodayWeatherInfo(response.main);
+        return;
+      }
+
+      const request = await fetch(
+        `${BASE_URL}/forecast?q=${city?.title}&appid=${process.env.REACT_APP_API_KEY}&units=metric`,
+      );
       const response = await request.json();
 
-      setFiveDayWeatherInfo(null);
-      setTodayWeatherInfo(response.main);
-      return;
-    }
+      const fiveDayForecast = response?.list?.map((forecast: any) => {
+        const date = format(new Date(forecast.dt_txt), 'yyyy-MM-dd');
 
-    const request = await fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${city?.title}&appid=${API_KEY}&units=metric`);
-    const response = await request.json();
+        return {
+          ...{
+            ...forecast.main,
+            dateAndTime: forecast.dt_txt,
+          },
+          date,
+        };
+      });
 
-    const fiveDayForecast = response?.list?.map((forecast: any) => {
-      const date = format(new Date(forecast.dt_txt), 'yyyy-MM-dd');
+      const groupedForecast = groupBy(fiveDayForecast, 'date');
 
-      return {
-        ...{
-          ...forecast.main,
-          dateAndTime: forecast.dt_txt
-        },
-        date,
-      }
-    })
-
-    const groupedForecast = groupBy(fiveDayForecast, 'date');
-
-    setFiveDayWeatherInfo(Object.keys(groupedForecast)?.map(d => ({
-      date: d,
-      forecast: groupedForecast[d]
-    })));
-    setTodayWeatherInfo(null);
-  }, [city]);
+      setFiveDayWeatherInfo(
+        Object.keys(groupedForecast)?.map(d => ({
+          date: d,
+          forecast: groupedForecast[d],
+        })),
+      );
+      setTodayWeatherInfo(null);
+    },
+    [city],
+  );
 
   return (
     <Box pt={8}>
@@ -89,18 +100,35 @@ function App() {
             value={city}
             onChange={onSelectItem}
             options={cities}
-            renderInput={(params: any) => <TextField {...params} label="City" variant="outlined" />}
+            renderInput={(params: any) => (
+              <TextField {...params} label="City" variant="outlined" />
+            )}
           />
         </Grid>
 
         <Box mt={2}>
-          <Typography gutterBottom variant="h6" color="textPrimary" component="h4">
+          <Typography
+            gutterBottom
+            variant="h6"
+            color="textPrimary"
+            component="h4"
+          >
             Temperature By:
           </Typography>
 
-          <Grid item direction="row">
-            <Button color="primary" onClick={() => fetchForecast(FetchForecastEnum.NOW)}>Today</Button>
-            <Button color="primary" onClick={() => fetchForecast(FetchForecastEnum.FIVEDAY)}>5-day</Button>
+          <Grid container direction="row">
+            <Button
+              color="primary"
+              onClick={() => fetchForecast(FetchForecastEnum.NOW)}
+            >
+              Today
+            </Button>
+            <Button
+              color="primary"
+              onClick={() => fetchForecast(FetchForecastEnum.FIVEDAY)}
+            >
+              5-day
+            </Button>
           </Grid>
         </Box>
 
@@ -118,6 +146,6 @@ function App() {
       </Grid>
     </Box>
   );
-}
+};
 
 export default App;

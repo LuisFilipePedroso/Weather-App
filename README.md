@@ -31,6 +31,10 @@ Blumenau 5 Day Forecast:
   <img src="./src/assets/Forecast2.png">
 </p>
 
+## Important Rules
+
+You can only set a city as favorite in Today Forecast mode.
+
 ## Running the project:
 
 First, you must have to install the dependencies. This project was created using Yarn, so I recommend you to use yarn:
