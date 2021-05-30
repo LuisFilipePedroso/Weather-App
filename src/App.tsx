@@ -1,25 +1,122 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback, useEffect, useState } from 'react';
+import AutoComplete from './components/AutoComplete';
+import { TextField, Grid, Box, Typography, Button } from '@material-ui/core';
+import WeatherInfo, { WeatherInfoType } from './components/WeatherInfo';
+
+import { groupBy } from 'lodash';
+import { format } from 'date-fns';
+import FiveDayWeatherInfo from './components/FiveDayWeatherInfo';
+
+export type CityType = {
+  title: string;
+}
+
+export type FiveDayForecastType = {
+  date: string;
+  forecast: WeatherInfoType[];
+}
+
+enum FetchForecastEnum {
+  NOW,
+  FIVEDAY
+}
+
+const API_KEY = '5dcec63d6d98e98943ea329fb5cb14f7';
 
 function App() {
+  const [city, setCity] = useState<CityType | null>(null);
+  const [todayWeatherInfo, setTodayWeatherInfo] = useState<WeatherInfoType | null>(null);
+  const [fiveDayWeatherInfo, setFiveDayWeatherInfo] = useState<FiveDayForecastType[] | null>(null);
+
+  const cities = [
+    { title: 'Agronômica' },
+    { title: 'Blumenau' },
+    { title: 'Florianópolis' },
+    { title: 'Rio de Janeiro' },
+    { title: 'Rio do Sul' },
+    { title: 'São Paulo' },
+  ] as CityType[];
+
+  const onSelectItem = (value: CityType) => {
+    setCity(value);
+    setTodayWeatherInfo(null);
+    setFiveDayWeatherInfo(null);
+  }
+
+  const fetchForecast = useCallback(async (type: FetchForecastEnum) => {
+    if (!city) {
+      return;
+    }
+
+    if (type === FetchForecastEnum.NOW) {
+      const request = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city?.title}&appid=${API_KEY}&units=metric`);
+      const response = await request.json();
+
+      setFiveDayWeatherInfo(null);
+      setTodayWeatherInfo(response.main);
+      return;
+    }
+
+    const request = await fetch(`http://api.openweathermap.org/data/2.5/forecast?q=${city?.title}&appid=${API_KEY}&units=metric`);
+    const response = await request.json();
+
+    const fiveDayForecast = response?.list?.map((forecast: any) => {
+      const date = format(new Date(forecast.dt_txt), 'yyyy-MM-dd');
+
+      return {
+        ...{
+          ...forecast.main,
+          dateAndTime: forecast.dt_txt
+        },
+        date,
+      }
+    })
+
+    const groupedForecast = groupBy(fiveDayForecast, 'date');
+
+    setFiveDayWeatherInfo(Object.keys(groupedForecast)?.map(d => ({
+      date: d,
+      forecast: groupedForecast[d]
+    })));
+    setTodayWeatherInfo(null);
+  }, [city]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box pt={8}>
+      <Grid container direction="column" alignItems="center">
+        <Grid item sm={12} md={6} lg={8} style={{ width: '100%' }}>
+          <AutoComplete
+            value={city}
+            onChange={onSelectItem}
+            options={cities}
+            renderInput={(params: any) => <TextField {...params} label="City" variant="outlined" />}
+          />
+        </Grid>
+
+        <Box mt={2}>
+          <Typography gutterBottom variant="h6" color="textPrimary" component="h4">
+            Temperature By:
+          </Typography>
+
+          <Grid item direction="row">
+            <Button color="primary" onClick={() => fetchForecast(FetchForecastEnum.NOW)}>Today</Button>
+            <Button color="primary" onClick={() => fetchForecast(FetchForecastEnum.FIVEDAY)}>5-day</Button>
+          </Grid>
+        </Box>
+
+        {todayWeatherInfo !== null && (
+          <Grid item sm={12} md={6} lg={8} style={{ width: '100%' }}>
+            <WeatherInfo data={todayWeatherInfo} city={city?.title} />
+          </Grid>
+        )}
+
+        {fiveDayWeatherInfo !== null && (
+          <Grid item sm={12} md={6} lg={8} style={{ width: '100%' }}>
+            <FiveDayWeatherInfo data={fiveDayWeatherInfo} city={city?.title} />
+          </Grid>
+        )}
+      </Grid>
+    </Box>
   );
 }
 
