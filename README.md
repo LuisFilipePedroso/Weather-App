@@ -1,11 +1,11 @@
 # Weather App
 
 Needs to travel and wants to know the weather of this place? Weather App can help you.
-The goal of this project is to helps you to discover the weather of a place. 
+The goal of this project is to helps you to discover the weather of a place.
 
 ## How to use it:
 
-When you access the Weather App, you'll see the home page. 
+When you access the Weather App, you'll see the home page.
 
 <p align="center">
   <img src="./src/assets/Dashboard1.png">
@@ -17,7 +17,7 @@ To see the temperature of a city, you must have to choose a city, in the City fi
   <img src="./src/assets/Dashboard2.png">
 </p>
 
-In our example, we'll discoreved the Forecast for Blumenau city. 
+In our example, we'll discoreved the Forecast for Blumenau city.
 
 Blumenau Forecast Today:
 
@@ -44,3 +44,5 @@ First, you must have to install the dependencies. This project was created using
 After installing the dependencies, run the project with the following command:
 
     yarn start
+
+Then, you must have to add your Open Weather API Key in .env. So, you must have to create .env file based on .env.example file and paste your API_KEY generated in Open Weather.
