@@ -1,46 +1,42 @@
-# Getting Started with Create React App
+# Weather App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Needs to travel and wants to know the weather of this place? Weather App can help you.
+The goal of this project is to helps you to discover the weather of a place. 
 
-## Available Scripts
+## How to use it:
 
-In the project directory, you can run:
+When you access the Weather App, you'll see the home page. 
 
-### `yarn start`
+<p align="center">
+  <img src="./src/assets/Dashboard1.png">
+</p>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To see the temperature of a city, you must have to choose a city, in the City field. After choosing a City, you'll be able to see the Today Forecast or 5 Day Forecast.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+<p align="center">
+  <img src="./src/assets/Dashboard2.png">
+</p>
 
-### `yarn test`
+In our example, we'll discoreved the Forecast for Blumenau city. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Blumenau Forecast Today:
 
-### `yarn build`
+<p align="center">
+  <img src="./src/assets/Forecast1.png">
+</p>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Blumenau 5 Day Forecast:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+<p align="center">
+  <img src="./src/assets/Forecast2.png">
+</p>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Running the project:
 
-### `yarn eject`
+First, you must have to install the dependencies. This project was created using Yarn, so I recommend you to use yarn:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    yarn
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+After installing the dependencies, run the project with the following command:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+    yarn start
